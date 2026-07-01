@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div id="status">Extracting…</div>
+    <textarea id="output" readonly placeholder="Cleaned Markdown will appear here."></textarea>
+    <button id="copy" disabled>Copy</button>
+    <script src="vendor/turndown.js"></script>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

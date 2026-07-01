@@ -1,0 +1,15 @@
+{
+  "name": "html-strip",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Extract clean, LLM-ready Markdown from the current page.",
+  "scripts": {
+    "test": "node --test",
+    "vendor": "node scripts/vendor.js"
+  },
+  "devDependencies": {
+    "@mozilla/readability": "^0.5.0",
+    "turndown": "^7.2.0"
+  }
+}
