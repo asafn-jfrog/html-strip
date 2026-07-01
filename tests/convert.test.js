@@ -39,6 +39,24 @@ test('converts tables to Markdown pipe tables with the gfm plugin', () => {
   );
 });
 
+test('converts headerless tables to pipe tables instead of leaking raw HTML', () => {
+  const md = htmlToMarkdown(
+    TurndownService,
+    '<table><tbody>' +
+      '<tr><td>Repository Name:</td><td>dev-master-docker-local</td></tr>' +
+      '<tr><td>Scanned by Xray:</td><td>False</td></tr>' +
+      '</tbody></table>',
+    gfm
+  );
+  assert.ok(!md.includes('<table'), `raw table leaked: ${md}`);
+  assert.equal(
+    md,
+    '| Repository Name: | dev-master-docker-local |\n' +
+      '| --- | --- |\n' +
+      '| Scanned by Xray: | False |'
+  );
+});
+
 test('drops non-content elements (scripts, forms, svg) instead of leaking markup', () => {
   const md = htmlToMarkdown(
     TurndownService,
