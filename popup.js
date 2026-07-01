@@ -36,7 +36,8 @@ async function main() {
       fail("Couldn't find main content on this page.");
       return;
     }
-    const body = htmlToMarkdown(window.TurndownService, result.content);
+    const gfmPlugin = window.turndownPluginGfm && window.turndownPluginGfm.gfm;
+    const body = htmlToMarkdown(window.TurndownService, result.content, gfmPlugin);
     const header = buildMetadataHeader(result, tab.url);
     render(assembleOutput(header, body));
   } catch {
