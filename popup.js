@@ -39,7 +39,7 @@ async function main() {
     const body = htmlToMarkdown(window.TurndownService, result.content);
     const header = buildMetadataHeader(result, tab.url);
     render(assembleOutput(header, body));
-  } catch (e) {
+  } catch {
     fail("This page can't be read by the extension.");
   }
 }

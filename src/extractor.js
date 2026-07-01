@@ -16,7 +16,7 @@ export function extractArticle() {
       siteName: article.siteName,
       content: article.content,
     };
-  } catch (e) {
+  } catch {
     return { ok: false, reason: 'error' };
   }
 }
