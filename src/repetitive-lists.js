@@ -75,3 +75,25 @@ export function detectRepetitiveLists(root) {
   }
   return { clusters };
 }
+
+export function replaceClustersWithPlaceholders(root) {
+  const { clusters } = detectRepetitiveLists(root);
+  const doc = root.ownerDocument || root;
+  return clusters.map((cluster, index) => {
+    const token = `⟦LIST${index}⟧`;
+    const [first] = cluster.nodes;
+    const placeholder = doc.createElement('p');
+    placeholder.textContent = token;
+    first.parentNode.insertBefore(placeholder, first);
+    for (const node of cluster.nodes) node.remove();
+    return { token, markdown: cluster.markdown };
+  });
+}
+
+// Expose as page globals so the extension's injected extractor (which runs in
+// the page, not this module) can call them. Skipped under Node (no `window`);
+// the generated classic-script copy in page/ relies on this block.
+if (typeof window !== 'undefined') {
+  window.detectRepetitiveLists = detectRepetitiveLists;
+  window.replaceClustersWithPlaceholders = replaceClustersWithPlaceholders;
+}

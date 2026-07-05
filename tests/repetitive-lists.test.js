@@ -77,3 +77,33 @@ test('excludes script/svg text from bullets', () => {
   assert.equal(clusters[0].markdown.includes('evil'), false);
   assert.equal(clusters[0].markdown, '- Keep • $1\n- Keep • $2\n- Keep • $3');
 });
+
+// Task 2: replaceClustersWithPlaceholders tests
+import { replaceClustersWithPlaceholders } from '../src/repetitive-lists.js';
+
+test('replaces each cluster with a sentinel <p> token and returns markdown', () => {
+  const doc = docFrom(
+    '<div id="host">' +
+      '<p>before</p>' +
+      '<a class="card"><span>Sec 1</span><b>$10</b></a>' +
+      '<a class="card"><span>Sec 2</span><b>$20</b></a>' +
+      '<a class="card"><span>Sec 3</span><b>$30</b></a>' +
+      '<p>after</p>' +
+      '</div>'
+  );
+  const lists = replaceClustersWithPlaceholders(doc);
+  assert.equal(lists.length, 1);
+  assert.equal(lists[0].token, '⟦LIST0⟧');
+  assert.equal(lists[0].markdown, '- Sec 1 • $10\n- Sec 2 • $20\n- Sec 3 • $30');
+
+  const host = doc.getElementById('host');
+  // Cards removed, one <p> token inserted where the first card was.
+  assert.equal(host.querySelectorAll('a.card').length, 0);
+  const texts = Array.from(host.children).map((c) => c.textContent);
+  assert.deepEqual(texts, ['before', '⟦LIST0⟧', 'after']);
+});
+
+test('returns an empty array when there are no clusters', () => {
+  const doc = docFrom('<div><p>just prose</p></div>');
+  assert.deepEqual(replaceClustersWithPlaceholders(doc), []);
+});
