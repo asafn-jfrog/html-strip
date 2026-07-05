@@ -58,7 +58,7 @@ export function detectRepetitiveLists(root) {
     }
     for (const items of groups.values()) {
       if (items.length < 3) continue;
-      if (!items.some(hasNestedStructure)) continue;
+      if (!items.every(hasNestedStructure)) continue;
       const bullets = items.map(itemBullet).filter((b) => b.length > 0);
       if (bullets.length < 3) continue;
       clusters.push({

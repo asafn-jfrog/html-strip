@@ -39,6 +39,17 @@ test('ignores plain prose lists whose items lack nested structure', () => {
   assert.equal(detectRepetitiveLists(doc).clusters.length, 0);
 });
 
+test('ignores a mixed list where only some items have nested structure', () => {
+  const doc = docFrom(
+    '<ul>' +
+      '<li>one</li>' +
+      '<li><span>two</span></li>' +
+      '<li>three</li>' +
+      '</ul>'
+  );
+  assert.equal(detectRepetitiveLists(doc).clusters.length, 0);
+});
+
 test('reports only the outermost cluster when clusters nest', () => {
   const inner =
     '<div class="row"><span>x</span><span>y</span><span>z</span></div>';
