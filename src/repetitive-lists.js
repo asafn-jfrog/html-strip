@@ -16,13 +16,24 @@ const NON_CONTENT_TAGS = new Set([
   'SELECT',
 ]);
 
+// Tags that are inherently prose containers, never card wrappers. Excluding
+// them keeps repeated rich paragraphs/headings in Readability's flow rather
+// than mangling them into bullets.
+const PROSE_TAGS = new Set(['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE']);
+
 function structureSignature(el) {
   const classes = Array.from(el.classList).sort().join(' ');
   return `${el.tagName}|${classes}`;
 }
 
 function hasNestedStructure(el) {
-  return el.children.length > 0;
+  // A genuine card is not a prose block and has real nested structure:
+  // at least two descendant elements. A flat rich paragraph like
+  // <p>text <a>x</a></p> (one inline child, or a prose tag) does not qualify.
+  // querySelectorAll is used (not querySelector) because domino returns
+  // `undefined` from querySelector for childless elements.
+  if (PROSE_TAGS.has(el.tagName)) return false;
+  return el.querySelectorAll('*').length >= 2;
 }
 
 function collectLeafText(node, parts) {

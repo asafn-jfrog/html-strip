@@ -107,3 +107,27 @@ test('returns an empty array when there are no clusters', () => {
   const doc = docFrom('<div><p>just prose</p></div>');
   assert.deepEqual(replaceClustersWithPlaceholders(doc), []);
 });
+
+test('ignores repeated rich paragraphs (prose with inline elements)', () => {
+  const doc = docFrom(
+    '<div>' +
+      '<p class="para">Intro with <a href="#">a link</a> and <strong>bold</strong>.</p>' +
+      '<p class="para">More text with <a href="#">another</a> and <strong>b</strong>.</p>' +
+      '<p class="para">Final <a href="#">paragraph</a> and <strong>c</strong>.</p>' +
+      '</div>'
+  );
+  assert.equal(detectRepetitiveLists(doc).clusters.length, 0);
+});
+
+test('detects single-wrapper cards with deep nesting (VividSeats shape)', () => {
+  const card = (n) =>
+    '<a class="card"><div class="row"><span class="name">Sec ' + n +
+    '</span><span class="price">$' + n + '0</span></div></a>';
+  const doc = docFrom('<div>' + card(1) + card(2) + card(3) + '</div>');
+  const { clusters } = detectRepetitiveLists(doc);
+  assert.equal(clusters.length, 1);
+  assert.equal(
+    clusters[0].markdown,
+    '- Sec 1 • $10\n- Sec 2 • $20\n- Sec 3 • $30'
+  );
+});
