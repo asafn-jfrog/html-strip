@@ -32,3 +32,31 @@ test('assembleOutput trims body and adds spacing + trailing newline', () => {
   const out = assembleOutput('# H\nSource: u', '  body text  ');
   assert.equal(out, '# H\nSource: u\n\nbody text\n');
 });
+
+import { applyLists } from '../src/markdown.js';
+
+test('applyLists returns the body unchanged when there are no lists', () => {
+  assert.equal(applyLists('hello', []), 'hello');
+  assert.equal(applyLists('hello', undefined), 'hello');
+});
+
+test('applyLists replaces a surviving token in place', () => {
+  const body = 'Intro paragraph.\n\n⟦LIST0⟧\n\nOutro paragraph.';
+  const out = applyLists(body, [{ token: '⟦LIST0⟧', markdown: '- a\n- b' }]);
+  assert.equal(out, 'Intro paragraph.\n\n- a\n- b\n\nOutro paragraph.');
+});
+
+test('applyLists appends lists whose token was dropped', () => {
+  const body = 'Only prose survived.';
+  const out = applyLists(body, [{ token: '⟦LIST0⟧', markdown: '- a\n- b' }]);
+  assert.equal(out, 'Only prose survived.\n\n- a\n- b');
+});
+
+test('applyLists handles a mix of surviving and dropped tokens', () => {
+  const body = 'Top.\n\n⟦LIST1⟧';
+  const out = applyLists(body, [
+    { token: '⟦LIST0⟧', markdown: '- gone' },
+    { token: '⟦LIST1⟧', markdown: '- kept' },
+  ]);
+  assert.equal(out, 'Top.\n\n- kept\n\n- gone');
+});
