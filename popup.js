@@ -1,6 +1,6 @@
 import { extractArticle } from './src/extractor.js';
 import { htmlToMarkdown } from './src/convert.js';
-import { buildMetadataHeader, assembleOutput } from './src/markdown.js';
+import { buildMetadataHeader, assembleOutput, applyLists } from './src/markdown.js';
 
 const statusEl = document.getElementById('status');
 const outputEl = document.getElementById('output');
@@ -26,7 +26,7 @@ async function main() {
   try {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      files: ['vendor/readability.js'],
+      files: ['vendor/readability.js', 'page/detect-clusters.js'],
     });
     const [{ result }] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
@@ -38,8 +38,9 @@ async function main() {
     }
     const gfmPlugin = window.turndownPluginGfm && window.turndownPluginGfm.gfm;
     const body = htmlToMarkdown(window.TurndownService, result.content, gfmPlugin);
+    const withLists = applyLists(body, result.lists);
     const header = buildMetadataHeader(result, tab.url);
-    render(assembleOutput(header, body));
+    render(assembleOutput(header, withLists));
   } catch {
     fail("This page can't be read by the extension.");
   }
